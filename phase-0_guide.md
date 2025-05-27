@@ -1,72 +1,47 @@
-# MNIST CLI Project: Comprehensive Management Tool
-
-<a target="_blank" href="https://cookiecutter-data-science.drivendata.org/">
-    <img src="https://img.shields.io/badge/CCDS-Project%20template-328F97?logo=cookiecutter" />
-</a>
+# MNIST Digit Recognizer: CLI Management Tool
 
 **Current Project Phase (for initial development): Phase 0 - Comprehensive CLI Tool**
 
-This project provides a command-line interface (CLI) for managing the lifecycle of deep learning models for the MNIST handwritten digit recognition task. It leverages TensorFlow 2.x and aims to provide a structured environment for experimentation, training, evaluation, model versioning, robust reporting, and preparation for deployment. The project structure is inspired by `cookiecutter-data-science` and adapted for the specific needs of this ML application.
+This document outlines the planning and documentation for the MNIST Digit Recognizer CLI Management Tool. It is designed to be a comprehensive utility for training, evaluating, managing, and deploying MNIST models.
 
 ---
 
 ## **Part 1: Project Planning (Developer's Guide)**
 
-This section outlines the step-by-step plan to build the MNIST CLI tool.
+This section details the step-by-step plan to build the MNIST CLI tool.
 
-### **0. MVP for Interview Showcase (Ultra-Minimal Slice for Today)**
+### **0. MVP for Interview Showcase (Ultra-Minimal Slice)**
 
-- **Goal:** Demonstrate basic end-to-end ML capability **today**.
+- **Goal:** Demonstrate basic end-to-end ML capability.
 - **Tasks (Highest Priority for "Tomorrow"):**
-  1.  If you haven't, quickly run `cookiecutter https://github.com/drivendataorg/cookiecutter-data-science` to generate the `python_mnist_ml` base.
-  2.  Setup basic Python environment: `cd python_mnist_ml`, create/activate venv, `pip install tensorflow Pillow typer`.
-  3.  Create a single Python script in the root of `python_mnist_ml` named `quick_showcase.py`:
-      - Defines a simple Keras CNN for MNIST.
-      - Loads MNIST data using `tf.keras.datasets.mnist.load_data()`. Preprocess it minimally (normalize, reshape).
-      - Trains the model for a few (3-5) epochs.
-      - Saves the model using `model.save('showcase_model_sm')` (SavedModel format).
-      - Includes a function that loads `'showcase_model_sm'` and predicts on an image path passed as a command-line argument (use `sys.argv`).
-  4.  Have 1-2 simple digit images ready for prediction (e.g., in `data/02_custom_input_images/`).
-- **Showcase:** Briefly explain you used CCDS for structure. Run `python quick_showcase.py path/to/your/digit.png`. Show the (brief) training output and the prediction. Then, _talk about_ the larger, more structured CLI tool and its features using the rest of this document as your guide. Next, _talk about_ the web app and GCP plans using the rest of this document as your guide.
+  1.  Setup basic Python environment with TensorFlow.
+  2.  Write a single Python script (`quick_train_predict.py`):
+      - Defines a simple CNN for MNIST.
+      - Loads MNIST data.
+      - Trains the model for a few epochs.
+      - Saves the model (SavedModel format).
+      - Includes a function to load the saved model and predict on a sample image path given as a command-line argument.
+  3.  Prepare 1-2 sample digit images for prediction.
+- **Showcase:** Run the script, show training (briefly), then predict on your sample images. Then, _talk about_ the larger CLI tool, web app, and GCP plans using the rest of this document as your guide.
 
-### **1. Initial Project Setup (Leveraging Cookiecutter)**
+### **1. Project Setup & Environment**
 
-1.  **Generate Project from Template:**
-    - `pip install cookiecutter` (if not already installed).
-    - `cookiecutter https://github.com/drivendataorg/cookiecutter-data-science`
-    - Answer prompts as suggested in the "Adapting Cookiecutter Data Science" section (e.g., `repo_name: python_mnist_ml`, `module_name: src` (or choose another and rename), select `virtualenv`, `requirements.txt`, `flake8+black+isort`, `MIT License`, etc.).
-2.  **Navigate to Project:** `cd python_mnist_ml`
-3.  **Adapt CCDS Structure:**
-    - Rename `src/your_module_name/` to `src/` if necessary, or adjust plans to use `your_module_name` as the main source package. (The plan below assumes `src/`).
-    - Create/Ensure the following top-level directories (if not perfectly matching CCDS output):
-      - `configs/hyperparams/`
-      - `configs/training_sessions/`
-      - `models_trained/` (rename from CCDS `models/`)
-      - `models_tfjs/`
-      - `data/01_raw/` (CCDS `data/raw/`)
-      - `data/02_custom_input_images/`
-    - Within `src/`, create our planned subdirectories: `cli/`, `core/`, `utils/`, and `main_cli.py`.
-4.  **Setup Virtual Environment & Dependencies:**
-    - CCDS might set up a basic `requirements.txt`. You'll need to manage this.
-    - `python -m venv venv` (if not already done by CCDS setup)
-    - `source venv/bin/activate` (or `venv\Scripts\activate`)
-    - `pip install -r requirements.txt` (if CCDS provided a useful one)
-    - `pip install tensorflow numpy matplotlib Pillow pyyaml typer[all] tqdm scikit-learn tensorflowjs`
-    - (Optional But Recommended) `pip install black flake8 isort ipykernel jupyterlab`
-    - `pip freeze > requirements.txt` (to update it)
-5.  **Git Initialization:**
-    - CCDS usually initializes a git repository. Make your initial commit.
+1.  **Create Project Root Directory:** `python_mnist_ml`
+2.  **Initialize Git:** `git init`
+3.  **Setup Python Virtual Environment:**
+    - `python -m venv venv`
+    - `source venv/bin/activate` (Linux/macOS) or `venv\Scripts\activate` (Windows)
     - Create `.gitignore` (add `venv/`, `__pycache__/`, `*.egg-info/`, `data/01_raw/mnist.npz` if downloaded manually, `build/`, `dist/`, `*.log`, etc.)
-6.  **Verify TensorFlow GPU Setup:**
-    - Use `notebooks/00_env_check.ipynb` (create this).
+4.  **Install Core Libraries:**
+    - `pip install tensorflow numpy matplotlib Pillow pyyaml typer[all] tqdm scikit-learn`
+    - (Optional but Recommended) `pip install black flake8 ipykernel jupyterlab` (for notebooks and formatting)
+    - `pip freeze > requirements.txt`
+5.  **Verify TensorFlow GPU Setup (in a Jupyter Notebook or test script):**
     - Run the CUDA check script provided previously. Ensure TensorFlow recognizes the GPU.
-7.  **Code Formatting & Linting:**
-    - Setup `black`, `flake8`, `isort` as per CCDS selection. Configure your IDE or use the `Makefile` targets.
+6.  **Code Formatting (Convention):**
     - Adopt **Black** for code formatting (`pip install black`). Run `black .` before commits.
     - Use **Flake8** for linting (`pip install flake8`). Run `flake8 .`.
-    - **Code Formatting Convention:** Adhere to Black.
     - (Optional) Configure pre-commit hooks.
-8.  **Naming Convention (Code):** Snake case for functions, variables, and filenames (e.g., `my_function.py`). PascalCase for classes (e.g., `MyClass`).
 
 ### **2. Directory Structure (Inspired by CCDS & Project Needs)**
 
@@ -74,72 +49,65 @@ This section outlines the step-by-step plan to build the MNIST CLI tool.
 python_mnist_ml/
 ├── .git/
 ├── .gitignore
-├── configs/                                # Project-specific: YAML for hyperparams & training sessions
-│   ├── hyperparams/                        # YAML: hp_default.yaml, hp_fast_train.yaml
-│   └── training_sessions/                  # YAML: ts_robust_cnn_v1_run1.yaml
-├── data/                                   # Data files, organized by processing stage
-│   ├── 01_raw/                             # Raw immutable data (e.g., MNIST auto-download via TensorFlow/Keras)
-│   ├── 02_custom_input_images/             # User-provided sample images for prediction (testing)
-│   ├── 03_tfrecords/                       # (Future) For optimized TFRecord datasets
-│   ├── external/                           # Data from third-party sources (CCDS standard)
-│   ├── interim/                            # Intermediate data that has been transformed (CCDS standard)
-│   └── processed/                          # The final, canonical data sets for modeling (CCDS standard)
-├── docs/                                   # Project documentation (e.g., MkDocs if selected)
-├── models_trained/                         # Output: Trained models (SavedModel), logs, plots, configs
-│   └── {model_name}/                       # Model-specific subdirectory (e.g `mnist_cnn_robust_v1_1.0_20250528_1030_acc0.9910`)
+├── configs/
+│   ├── hyperparams/                                      # YAML: hp_default.yaml, hp_fast_train.yaml
+│   └── training_sessions/                                # YAML: ts_robust_cnn_v1_run1.yaml
+├── data/
+│   ├── 01_raw/                                           # MNIST data auto-downloads here via TensorFlow/Keras
+│   ├── 02_custom_input_images/                           # Sample images for prediction testing
+│   └── 03_tfrecords/                                     # (Future) For optimized TFRecord datasets
+├── docs/                                                 # For additional documentation (e.g., architecture diagrams)
+├── models_trained/                                       # Output: Trained models (SavedModel format), each in a sub-dir
+│   └── mnist_cnn_robust_v1_1.0_20250528_1030_acc0.9910/
 │       ├── saved_model.pb
 │       ├── variables/
 │       ├── assets/
-│       ├── training_config_used.yaml       # Copy of training session config
-│       ├── hyperparams_config_used.yaml    # Copy of hyperparams config
-│       ├── training_log.csv                # Epoch-wise metrics
+│       ├── training_config_used.yaml                     # Copy of training session config
+│       ├── hyperparams_config_used.yaml                  # Copy of hyperparams config
+│       ├── training_log.csv                              # Epoch-wise metrics
 │       ├── accuracy_plot.png
 │       ├── loss_plot.png
-│       └── model_card.md                   # Summary report for this model
-├── models_tfjs/                            # Output: TensorFlow.js converted models
-├── notebooks/                              # Jupyter notebooks for exploration and experimentation
+│       └── model_card.md                                 # Summary report for this model
+├── models_tfjs/                                          # Output: Converted TensorFlow.js models
+├── notebooks/                                            # Jupyter notebooks for experimentation & exploration
 │   ├── 00_env_check.ipynb
 │   ├── 01_data_exploration.ipynb
 │   ├── 02_initial_model_training.ipynb
 │   └── 03_hyperparam_tuning_yaml.ipynb
-├── references/                             # Data dictionaries, manuals, and all other explanatory materials (CCDS standard)
-├── reports/                                # Generated analysis and reports (beyond individual model logs) as HTML, PDF, LaTeX, etc. (CCDS standard)
-│   └── figures/                            # Central place for generated graphics, plots, and figures to be used in reports
-├── requirements.txt                        # Project dependencies
-├── setup.py                                # Makes project pip installable (CCDS standard, if module_name was set)
-├── src/                                    # Source code for use in this project (or 'your_module_name')
-│   ├── __init__.py                         # Makes src a package
-│   ├── cli/                                # Typer CLI command modules
+├── reports/                                              # Generated reports, figures (beyond individual model logs)
+│   └── figures/                                          # Central place for comparison plots, etc.
+├── src/
+│   ├── __init__.py                                       # Makes src a package
+│   ├── cli/                                              # Typer CLI command modules
 │   │   ├── __init__.py
 │   │   ├── train_cli.py
 │   │   ├── predict_cli.py
 │   │   ├── model_cli.py
 │   │   └── convert_cli.py
-│   ├── core/                               # Core ML logic (data, models, training, etc.)
+│   ├── core/                                             # Core ML logic
 │   │   ├── __init__.py
-│   │   ├── data_processing.py              # Data loading, preprocessing, augmentation
-│   │   ├── model_architectures.py          # Model definitions & registry
-│   │   ├── training_engine.py              # Training loops, callbacks, saving
-│   │   ├── evaluation_engine.py            # Evaluation logic
-│   │   ├── prediction_engine.py            # Prediction logic
-│   │   └── tfjs_converter_utils.py         # Utilities for TF.js conversion
-│   ├── utils/                              # Helper utility functions
+│   │   ├── data_processing.py                            # Data loading, preprocessing, augmentation
+│   │   ├── model_architectures.py                        # Model definitions & registry
+│   │   ├── training_engine.py                            # Training loops, callbacks, saving
+│   │   ├── evaluation_engine.py                          # Evaluation logic
+│   │   ├── prediction_engine.py                          # Prediction logic
+│   │   └── tfjs_converter_utils.py                       # Utilities for TF.js conversion
+│   ├── utils/                                            # Helper utilities
 │   │   ├── __init__.py
-│   │   ├── config_loader.py                # Loads YAML configs
-│   │   ├── file_ops.py                     # File/directory operations
-│   │   └── logging_setup.py                # Centralized logging configuration
-│   └── main_cli.py                         # Main Typer app entry point
-├── tests/                                  # Automated tests (unit, integration) for future works
+│   │   ├── config_loader.py                              # Loads YAML configs
+│   │   ├── file_ops.py                                   # File/directory operations
+│   │   └── logging_setup.py                              # Centralized logging configuration
+│   └── main_cli.py                                       # Main Typer app entry point
+├── tests/                                                # Unit and integration tests (Future)
 │   ├── __init__.py
 │   ├── core/
 │   └── cli/
-├── Makefile                                # (Optional but Recommended) Makefile with commands like `make data`, `make train` (CCDS standard, extended)
-└── README.md                               # This file: the top-level README for developers (project documentation)
+├── Makefile                                              # (Optional but Recommended) For automating tasks
+├── requirements.txt
+└── README.md                                             # This file (Project Documentation part)
 ```
 
 ### **3. Configuration File Design (`configs/`)**
-
-(Same as previous plan: detail structure for hyperparams and training session YAMLs. Implement `src/utils/config_loader.py`.)
 
 1.  **Hyperparameter Configs (`configs/hyperparams/<name>.yaml`):**
     - Define sets of hyperparameters. Example: `hp_default.yaml`, `hp_robust_cnn_tuned.yaml`.
@@ -160,8 +128,6 @@ python_mnist_ml/
 3.  Implement `src/utils/config_loader.py` to load and merge these YAMLs.
 
 ### **4. Core Logic Implementation (`src/core/`)**
-
-(Same as previous plan: `data_processing.py`, `model_architectures.py`, `training_engine.py`, `evaluation_engine.py`, `prediction_engine.py`, `tfjs_converter_utils.py`. Emphasize robust image preprocessing in `data_processing.py` and model/log saving conventions in `training_engine.py`.)
 
 1.  **`data_processing.py`:**
     - Function `load_mnist_data()`: Returns `(x_train, y_train), (x_test, y_test)`.
@@ -196,8 +162,6 @@ python_mnist_ml/
 
 ### **5. CLI Interface Implementation (`src/cli/` & `src/main_cli.py`)**
 
-(Same as previous plan: modular Typer app with commands for training, model management, prediction, and TF.js conversion.)
-
 1.  **`main_cli.py`:** Setup main Typer app and add sub-apps.
 2.  **`train_cli.py`:**
     - `train start --config <path_to_training_session_yaml>`: Calls `training_engine.run_training_session`.
@@ -215,8 +179,6 @@ python_mnist_ml/
     - `file_ops.py`: Helpers for scanning directories, ensuring paths exist.
 
 ### **6. Robust Reporting Feature (Integrated into `training_engine` and `model_cli`)**
-
-(Same as previous plan: generation of plots, CSV logs, config copies, and `model_card.md` within each `models_trained/<model_name>/` directory.)
 
 1.  **During Training (`training_engine.py`):**
 
@@ -258,64 +220,47 @@ python_mnist_ml/
     - Read and pretty-print the `model_card.md`.
     - Optionally, re-plot graphs if needed or just point to the saved PNGs.
 
-### **7. Makefile Enhancement (Optional but Recommended for Automation)**
+### **7. Makefile (Optional but Recommended for Automation)**
 
-- Review the `Makefile` generated by CCDS.
-- Add/modify targets for:
-
-  - `lint`: `flake8 src tests`
-  - `format`: `black src tests`
-  - `install_dev`: Installs `requirements.txt` plus dev tools like `pytest`.
-  - `clean`: Removes `__pycache__`, `*.pyc`, build artifacts.
-  - `train_default_session`: Runs `python src/main_cli.py train start --config configs/training_sessions/ts_default_run.yaml`
-  - `list_models`: Runs `python src/main_cli.py model list-trained`
-  - `convert_default_model`: Converts a specific (or latest) model to TF.js.
-  - (Future) `test`: Runs `pytest`.
-
-- Example:
 - Create `Makefile` in project root:
 
-```makefile
-.PHONY: help install setup_notebook lint format clean_pyc clean_build train_default predict_example convert_default
+  ```makefile
+  .PHONY: help install setup_notebook lint format clean_pyc clean_build train_default predict_example convert_default
 
-help:
-  @echo "Commands:"
-  @echo "  install         : Install dependencies from requirements.txt"
-  @echo "  setup_notebook  : Install Jupyter kernel for this project"
-  @echo "  lint            : Lint code with flake8"
-  @echo "  format          : Format code with black"
-  @echo "  clean_pyc       : Remove Python file artifacts"
-  @echo "  clean_build     : Remove build artifacts"
-  @echo "  train_default   : Train with a default training session config"
-  @echo "  predict_example : Predict on a sample image with a default model"
-  @echo "  convert_default : Convert a default trained model to TF.js"
+  help:
+      @echo "Commands:"
+      @echo "  install         : Install dependencies from requirements.txt"
+      @echo "  setup_notebook  : Install Jupyter kernel for this project"
+      @echo "  lint            : Lint code with flake8"
+      @echo "  format          : Format code with black"
+      @echo "  clean_pyc       : Remove Python file artifacts"
+      @echo "  clean_build     : Remove build artifacts"
+      @echo "  train_default   : Train with a default training session config"
+      @echo "  predict_example : Predict on a sample image with a default model"
+      @echo "  convert_default : Convert a default trained model to TF.js"
 
-install:
-  pip install -r requirements.txt
+  install:
+      pip install -r requirements.txt
 
-setup_notebook:
-  pip install ipykernel
-  python -m ipykernel install --user --name=python_mnist_ml --display-name="Python (MNIST ML)"
+  setup_notebook:
+      pip install ipykernel
+      python -m ipykernel install --user --name=python_mnist_ml --display-name="Python (MNIST ML)"
 
-lint:
-  flake8 src tests
+  lint:
+      flake8 src tests
 
-format:
-  black src tests
+  format:
+      black src tests
 
-# ... other clean targets ...
+  # ... other clean targets ...
 
-train_default:
-  python src/main_cli.py train start --config configs/training_sessions/ts_default_session.yaml
+  train_default:
+      python src/main_cli.py train start --config configs/training_sessions/ts_default_session.yaml
 
-# ... other example targets ...
-```
+  # ... other example targets ...
+  ```
 
-### **8. Testing Strategy (Future)**
-
-- Plan to use `pytest`.
-- Write unit tests for functions in `src/core/` (especially data processing, config loading).
-- Write integration tests for CLI commands using `typer.testing.CliRunner`. Place these in the `tests/` directory.
+### **8. Testing (Future Focus)**
 
 - Plan for unit tests (`pytest`) for core functions in `data_processing.py`, `model_architectures.py`.
 - Plan for integration tests for CLI commands (e.g., using `typer.testing.CliRunner`).
@@ -328,7 +273,7 @@ train_default:
 
 ### **1. Project Overview**
 
-**MNIST CLI Project** is a command-line utility designed to streamline the lifecycle of developing, training, evaluating, and managing deep learning models for the MNIST handwritten digit recognition task. Built using TensorFlow 2.x and structured with best practices inspired by `cookiecutter-data-science`, it offers a robust environment for reproducible ML experimentation.
+**MNIST Digit Recognizer: CLI Management Tool** is a comprehensive command-line utility designed to streamline the entire lifecycle of developing, training, evaluating, and managing deep learning models for the MNIST handwritten digit recognition task. It provides a structured environment for experimentation, robust model versioning, and easy conversion for deployment.
 
 This tool is built with flexibility in mind, allowing users to define custom model architectures, configure training sessions through simple YAML files, and manage multiple trained models with detailed reporting.
 
@@ -340,13 +285,9 @@ This tool is built with flexibility in mind, allowing users to define custom mod
 - **Main Library:** TensorFlow 2.x (with Keras API)
 - **CLI Framework:** Typer
 - **Configuration:** YAML
-- **Code Style:** Black, Flake8, isort
-- **Environment Management:** virtualenv (with `requirements.txt`)
 - **Key Concepts:** Supervised Learning, Image Classification, CNNs, Hyperparameter Tuning, Model Versioning, Model Deployment (TF.js conversion).
 
 ### **3. Features**
-
-(Same list as in the previous README plan: Experimentation, Training, Model Management, Evaluation, Prediction, Deployment Preparation, Reporting.)
 
 - **Experimentation:**
   - Support for multiple, user-defined CNN architectures.
@@ -377,8 +318,6 @@ This tool is built with flexibility in mind, allowing users to define custom mod
 
 ### **4. Additional (Add-on) Features (Future Roadmap)**
 
-(Same list as in the previous README plan.)
-
 - Integration with experiment tracking tools (e.g., MLflow, Weights & Biases).
 - Support for other image datasets with minor configuration changes.
 - Automated hyperparameter optimization (e.g., using KerasTuner).
@@ -387,76 +326,9 @@ This tool is built with flexibility in mind, allowing users to define custom mod
 - Automated testing suite (unit and integration tests).
 - Support for distributed training (for larger models/datasets).
 
-### **5. Project Structure (Derived from Cookiecutter Data Science)**
+### **5. Project Structure**
 
-```plaintext
-python_mnist_ml/
-├── .git/
-├── .gitignore
-├── configs/                                # Project-specific: YAML for hyperparams & training sessions
-│   ├── hyperparams/                        # YAML: hp_default.yaml, hp_fast_train.yaml
-│   └── training_sessions/                  # YAML: ts_robust_cnn_v1_run1.yaml
-├── data/                                   # Data files, organized by processing stage
-│   ├── 01_raw/                             # Raw immutable data (e.g., MNIST auto-download via TensorFlow/Keras)
-│   ├── 02_custom_input_images/             # User-provided sample images for prediction (testing)
-│   ├── 03_tfrecords/                       # (Future) For optimized TFRecord datasets
-│   ├── external/                           # Data from third-party sources (CCDS standard)
-│   ├── interim/                            # Intermediate data that has been transformed (CCDS standard)
-│   └── processed/                          # The final, canonical data sets for modeling (CCDS standard)
-├── docs/                                   # Project documentation (e.g., MkDocs if selected)
-├── models_trained/                         # Output: Trained models (SavedModel), logs, plots, configs
-│   └── {model_name}/                       # Model-specific subdirectory (e.g `mnist_cnn_robust_v1_1.0_20250528_1030_acc0.9910`)
-│       ├── saved_model.pb
-│       ├── variables/
-│       ├── assets/
-│       ├── training_config_used.yaml       # Copy of training session config
-│       ├── hyperparams_config_used.yaml    # Copy of hyperparams config
-│       ├── training_log.csv                # Epoch-wise metrics
-│       ├── accuracy_plot.png
-│       ├── loss_plot.png
-│       └── model_card.md                   # Summary report for this model
-├── models_tfjs/                            # Output: TensorFlow.js converted models
-├── notebooks/                              # Jupyter notebooks for exploration and experimentation
-│   ├── 00_env_check.ipynb
-│   ├── 01_data_exploration.ipynb
-│   ├── 02_initial_model_training.ipynb
-│   └── 03_hyperparam_tuning_yaml.ipynb
-├── references/                             # Data dictionaries, manuals, and all other explanatory materials (CCDS standard)
-├── reports/                                # Generated analysis and reports (beyond individual model logs) as HTML, PDF, LaTeX, etc. (CCDS standard)
-│   └── figures/                            # Central place for generated graphics, plots, and figures to be used in reports
-├── requirements.txt                        # Project dependencies
-├── setup.py                                # Makes project pip installable (CCDS standard, if module_name was set)
-├── src/                                    # Source code for use in this project (or 'your_module_name')
-│   ├── __init__.py                         # Makes src a package
-│   ├── cli/                                # Typer CLI command modules
-│   │   ├── __init__.py
-│   │   ├── train_cli.py
-│   │   ├── predict_cli.py
-│   │   ├── model_cli.py
-│   │   └── convert_cli.py
-│   ├── core/                               # Core ML logic (data, models, training, etc.)
-│   │   ├── __init__.py
-│   │   ├── data_processing.py              # Data loading, preprocessing, augmentation
-│   │   ├── model_architectures.py          # Model definitions & registry
-│   │   ├── training_engine.py              # Training loops, callbacks, saving
-│   │   ├── evaluation_engine.py            # Evaluation logic
-│   │   ├── prediction_engine.py            # Prediction logic
-│   │   └── tfjs_converter_utils.py         # Utilities for TF.js conversion
-│   ├── utils/                              # Helper utility functions
-│   │   ├── __init__.py
-│   │   ├── config_loader.py                # Loads YAML configs
-│   │   ├── file_ops.py                     # File/directory operations
-│   │   └── logging_setup.py                # Centralized logging configuration
-│   └── main_cli.py                         # Main Typer app entry point
-├── tests/                                  # Automated tests (unit, integration) for future works
-│   ├── __init__.py
-│   ├── core/
-│   └── cli/
-├── Makefile                                # (Optional but Recommended) Makefile with commands like `make data`, `make train` (CCDS standard, extended)
-└── README.md                               # This file: the top-level README for developers (project documentation)
-```
-
-**Key Directory Explanations:** (Briefly explain the purpose of main directories, highlighting those from CCDS and our specific additions like `configs/`, `models_trained/`, `src/cli/`, etc.)
+(Insert the ASCII tree diagram of the `python_mnist_ml/` directory provided in "Project Planning" Section 2 here.)
 
 **Key Directories:**
 
@@ -474,8 +346,6 @@ python_mnist_ml/
 - `tests/`: (Future) Automated tests.
 
 ### **6. Configuration Files Guide**
-
-(Same as the previous README plan: Explain `hyperparams/*.yaml` and `training_sessions/*.yaml` with examples.)
 
 This project uses YAML files for managing configurations, promoting reproducibility and easy experimentation.
 
@@ -582,8 +452,6 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
 
 ### **8. Quickstart Guide**
 
-(Same as the previous README plan, ensure paths reflect the CCDS-based structure if needed, e.g., `make install_dev` might be a new first step from the Makefile.)
-
 1.  **Clone the Repository (if applicable) or Setup Project:**
     ```bash
     # Assuming you have the project files in python_mnist_ml/
@@ -622,8 +490,6 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
     ```
 
 ### **9. How-To Guides**
-
-(Same as the previous README plan: Detailed usage for each CLI command group.)
 
 **(This section would contain detailed instructions for each command group and feature)**
 
@@ -669,8 +535,6 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
 
 ### **10. Naming Conventions**
 
-(Same as the previous README plan: For model architectures, config files, trained models, TF.js models. Add conventions for branches if using Git extensively, e.g., `feature/`, `bugfix/`, `release/`.)
-
 - **Model Architecture Names (in `model_architectures.py` registry):** `Dataset_Purpose_ArchType_Version` (e.g., `MNIST_Classifier_CNN_Simple_v1`, `MNIST_Classifier_CNN_Robust_v1.1`).
 - **Hyperparameter Config Files (`configs/hyperparams/`):** `hp_<descriptive_name>.yaml` (e.g., `hp_default.yaml`, `hp_high_lr_sgd.yaml`).
 - **Training Session Config Files (`configs/training_sessions/`):** `ts_<descriptive_name>.yaml` (e.g., `ts_robust_cnn_initial_run.yaml`).
@@ -681,24 +545,12 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
 
 ### **11. Code Style & Formatting**
 
-- **Python Code:** Formatted using **Black** (see `pyproject.toml` if CCDS sets it up, or run `black .`).
-- **Linting:** Checked with **Flake8** (see configuration if CCDS sets it up, or run `flake8 .`).
-- **Import Sorting:** Managed by **isort** (see configuration if CCDS sets it up, or run `isort .`).
+- **Python Code:** Formatted using **Black** (default settings).
+- **Linting:** Checked with **Flake8**.
 - **Docstrings:** Use Google-style Python docstrings.
 - **Type Hinting:** Use type hints for function signatures and variables where beneficial for clarity.
 
-### **12. Makefile Usage**
-
-- The `Makefile` provides shortcuts for common development tasks.
-- Run `make help` to see available commands.
-- **Common commands:**
-  - `make install_dev` (or similar from CCDS for setting up env and dev tools)
-  - `make lint`
-  - `make format`
-  - `make train_default_session` (our custom target)
-  - (Future) `make test`
-
-### **13. Troubleshooting / FAQ**
+### **12. Troubleshooting / FAQ (Example)**
 
 - **Q: TensorFlow not finding GPU?**
   - A: Ensure NVIDIA drivers, CUDA Toolkit, and cuDNN are correctly installed and their versions are compatible with your TensorFlow version. Run the `00_env_check.ipynb` notebook. Make sure you installed `tensorflow` and not `tensorflow-cpu`.
@@ -711,11 +563,72 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
     - Normalization range (0-1 or -1 to 1, etc.).
     - Resizing and padding method.
 
-### **14. Contributing**
+### **13. Contributing (Future)**
 
-(Standard contribution guidelines: fork, branch, code style, tests, PR.)
 (Details on how to contribute if this were an open project: code style, testing requirements, pull request process.)
 
-### **15. License**
+### **14. License**
 
-MIT License
+(Specify a license, e.g., MIT License, Apache 2.0. For personal projects, this is optional but good practice.)
+
+```bash
+$ ccds https://github.com/drivendataorg/cookiecutter-data-science
+project_name (project_name): My Analysis
+repo_name (my_analysis): my_analysis
+module_name (my_analysis):
+author_name (Your name (or your organization/company/team)): Dat A. Scientist
+description (A short description of the project.): This is my analysis of the data.
+python_version_number (3.10): 3.12
+
+Select dataset_storage
+1 - none
+2 - azure
+3 - s3
+4 - gcs
+Choose from [1/2/3/4] (1): 3
+
+bucket (bucket-name): s3://my-aws-bucket
+
+aws_profile (default):
+
+Select environment_manager
+1 - virtualenv
+2 - conda
+3 - pipenv
+4 - uv
+5 - none
+Choose from [1/2/3/4/5] (1): 2
+
+Select dependency_file
+1 - requirements.txt
+2 - pyproject.toml
+3 - environment.yml
+4 - Pipfile
+Choose from [1/2/3/4] (1): 1
+
+Select pydata_packages
+1 - none
+2 - basic
+Choose from [1/2] (1): 2
+
+Select linting_and_formatting
+1 - ruff
+2 - flake8+black+isort
+Choose from [1/2] (1): 1
+
+Select open_source_license
+1 - No license file
+2 - MIT
+3 - BSD-3-Clause
+Choose from [1/2/3] (1): 2
+
+Select docs
+1 - mkdocs
+2 - none
+Choose from [1/2] (1): 1
+
+Select include_code_scaffold
+1 - Yes
+2 - No
+Choose from [1/2] (1): 2
+```

@@ -30,15 +30,15 @@ clean:
 ## Lint using flake8, black, and isort (use `make format` to do formatting)
 .PHONY: lint
 lint:
-	flake8 mnist_ml_core
-	isort --check --diff mnist_ml_core
-	black --check mnist_ml_core
+	flake8 src
+	isort --check --diff src
+	black --check src
 
 ## Format source code with black
 .PHONY: format
 format:
-	isort mnist_ml_core
-	black mnist_ml_core
+	isort src
+	black src
 
 
 
