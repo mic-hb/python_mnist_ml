@@ -18,55 +18,55 @@ This section outlines the step-by-step plan to build the MNIST CLI tool.
 
 - **Goal:** Demonstrate basic end-to-end ML capability **today**.
 - **Tasks (Highest Priority for "Tomorrow"):**
-  1.  If you haven't, quickly run `cookiecutter https://github.com/drivendataorg/cookiecutter-data-science` to generate the `python_mnist_ml` base.
-  2.  Setup basic Python environment: `cd python_mnist_ml`, create/activate venv, `pip install tensorflow Pillow typer`.
-  3.  Create a single Python script in the root of `python_mnist_ml` named `quick_showcase.py`:
-      - Defines a simple Keras CNN for MNIST.
-      - Loads MNIST data using `tf.keras.datasets.mnist.load_data()`. Preprocess it minimally (normalize, reshape).
-      - Trains the model for a few (3-5) epochs.
-      - Saves the model using `model.save('showcase_model_sm')` (SavedModel format).
-      - Includes a function that loads `'showcase_model_sm'` and predicts on an image path passed as a command-line argument (use `sys.argv`).
-  4.  Have 1-2 simple digit images ready for prediction (e.g., in `data/02_custom_input_images/`).
+  1. If you haven't, quickly run `cookiecutter https://github.com/drivendataorg/cookiecutter-data-science` to generate the `python_mnist_ml` base.
+  2. Setup basic Python environment: `cd python_mnist_ml`, create/activate venv, `pip install tensorflow Pillow typer`.
+  3. Create a single Python script in the root of `python_mnist_ml` named `quick_showcase.py`:
+     - Defines a simple Keras CNN for MNIST.
+     - Loads MNIST data using `tf.keras.datasets.mnist.load_data()`. Preprocess it minimally (normalize, reshape).
+     - Trains the model for a few (3-5) epochs.
+     - Saves the model using `model.save('showcase_model_sm')` (SavedModel format).
+     - Includes a function that loads `'showcase_model_sm'` and predicts on an image path passed as a command-line argument (use `sys.argv`).
+  4. Have 1-2 simple digit images ready for prediction (e.g., in `data/02_custom_input_images/`).
 - **Showcase:** Briefly explain you used CCDS for structure. Run `python quick_showcase.py path/to/your/digit.png`. Show the (brief) training output and the prediction. Then, _talk about_ the larger, more structured CLI tool and its features using the rest of this document as your guide. Next, _talk about_ the web app and GCP plans using the rest of this document as your guide.
 
 ### **1. Initial Project Setup (Leveraging Cookiecutter)**
 
-1.  **Generate Project from Template:**
-    - `pip install cookiecutter` (if not already installed).
-    - `cookiecutter https://github.com/drivendataorg/cookiecutter-data-science`
-    - Answer prompts as suggested in the "Adapting Cookiecutter Data Science" section (e.g., `repo_name: python_mnist_ml`, `module_name: src` (or choose another and rename), select `virtualenv`, `requirements.txt`, `flake8+black+isort`, `MIT License`, etc.).
-2.  **Navigate to Project:** `cd python_mnist_ml`
-3.  **Adapt CCDS Structure:**
-    - Rename `src/your_module_name/` to `src/` if necessary, or adjust plans to use `your_module_name` as the main source package. (The plan below assumes `src/`).
-    - Create/Ensure the following top-level directories (if not perfectly matching CCDS output):
-      - `configs/hyperparams/`
-      - `configs/training_sessions/`
-      - `models_trained/` (rename from CCDS `models/`)
-      - `models_tfjs/`
-      - `data/01_raw/` (CCDS `data/raw/`)
-      - `data/02_custom_input_images/`
-    - Within `src/`, create our planned subdirectories: `cli/`, `core/`, `utils/`, and `main_cli.py`.
-4.  **Setup Virtual Environment & Dependencies:**
-    - CCDS might set up a basic `requirements.txt`. You'll need to manage this.
-    - `python -m venv venv` (if not already done by CCDS setup)
-    - `source venv/bin/activate` (or `venv\Scripts\activate`)
-    - `pip install -r requirements.txt` (if CCDS provided a useful one)
-    - `pip install tensorflow numpy matplotlib Pillow pyyaml typer[all] tqdm scikit-learn tensorflowjs`
-    - (Optional But Recommended) `pip install black flake8 isort ipykernel jupyterlab`
-    - `pip freeze > requirements.txt` (to update it)
-5.  **Git Initialization:**
-    - CCDS usually initializes a git repository. Make your initial commit.
-    - Create `.gitignore` (add `venv/`, `__pycache__/`, `*.egg-info/`, `data/01_raw/mnist.npz` if downloaded manually, `build/`, `dist/`, `*.log`, etc.)
-6.  **Verify TensorFlow GPU Setup:**
-    - Use `notebooks/00_env_check.ipynb` (create this).
-    - Run the CUDA check script provided previously. Ensure TensorFlow recognizes the GPU.
-7.  **Code Formatting & Linting:**
-    - Setup `black`, `flake8`, `isort` as per CCDS selection. Configure your IDE or use the `Makefile` targets.
-    - Adopt **Black** for code formatting (`pip install black`). Run `black .` before commits.
-    - Use **Flake8** for linting (`pip install flake8`). Run `flake8 .`.
-    - **Code Formatting Convention:** Adhere to Black.
-    - (Optional) Configure pre-commit hooks.
-8.  **Naming Convention (Code):** Snake case for functions, variables, and filenames (e.g., `my_function.py`). PascalCase for classes (e.g., `MyClass`).
+1. **Generate Project from Template:**
+   - `pip install cookiecutter` (if not already installed).
+   - `cookiecutter https://github.com/drivendataorg/cookiecutter-data-science`
+   - Answer prompts as suggested in the "Adapting Cookiecutter Data Science" section (e.g., `repo_name: python_mnist_ml`, `module_name: src` (or choose another and rename), select `virtualenv`, `requirements.txt`, `flake8+black+isort`, `MIT License`, etc.).
+2. **Navigate to Project:** `cd python_mnist_ml`
+3. **Adapt CCDS Structure:**
+   - Rename `src/your_module_name/` to `src/` if necessary, or adjust plans to use `your_module_name` as the main source package. (The plan below assumes `src/`).
+   - Create/Ensure the following top-level directories (if not perfectly matching CCDS output):
+     - `configs/hyperparams/`
+     - `configs/training_sessions/`
+     - `models_trained/` (rename from CCDS `models/`)
+     - `models_tfjs/`
+     - `data/01_raw/` (CCDS `data/raw/`)
+     - `data/02_custom_input_images/`
+   - Within `src/`, create our planned subdirectories: `cli/`, `core/`, `utils/`, and `main_cli.py`.
+4. **Setup Virtual Environment & Dependencies:**
+   - CCDS might set up a basic `requirements.txt`. You'll need to manage this.
+   - `python -m venv venv` (if not already done by CCDS setup)
+   - `source venv/bin/activate` (or `venv\Scripts\activate`)
+   - `pip install -r requirements.txt` (if CCDS provided a useful one)
+   - `pip install tensorflow numpy matplotlib Pillow pyyaml typer[all] tqdm scikit-learn tensorflowjs`
+   - (Optional But Recommended) `pip install black flake8 isort ipykernel jupyterlab`
+   - `pip freeze > requirements.txt` (to update it)
+5. **Git Initialization:**
+   - CCDS usually initializes a git repository. Make your initial commit.
+   - Create `.gitignore` (add `venv/`, `__pycache__/`, `*.egg-info/`, `data/01_raw/mnist.npz` if downloaded manually, `build/`, `dist/`, `*.log`, etc.)
+6. **Verify TensorFlow GPU Setup:**
+   - Use `notebooks/00_env_check.ipynb` (create this).
+   - Run the CUDA check script provided previously. Ensure TensorFlow recognizes the GPU.
+7. **Code Formatting & Linting:**
+   - Setup `black`, `flake8`, `isort` as per CCDS selection. Configure your IDE or use the `Makefile` targets.
+   - Adopt **Black** for code formatting (`pip install black`). Run `black .` before commits.
+   - Use **Flake8** for linting (`pip install flake8`). Run `flake8 .`.
+   - **Code Formatting Convention:** Adhere to Black.
+   - (Optional) Configure pre-commit hooks.
+8. **Naming Convention (Code):** Snake case for functions, variables, and filenames (e.g., `my_function.py`). PascalCase for classes (e.g., `MyClass`).
 
 ### **2. Directory Structure (Inspired by CCDS & Project Needs)**
 
@@ -141,122 +141,123 @@ python_mnist_ml/
 
 (Same as previous plan: detail structure for hyperparams and training session YAMLs. Implement `src/utils/config_loader.py`.)
 
-1.  **Hyperparameter Configs (`configs/hyperparams/<name>.yaml`):**
-    - Define sets of hyperparameters. Example: `hp_default.yaml`, `hp_robust_cnn_tuned.yaml`.
-    - Structure: `learning_rate`, `batch_size`, `optimizer_name` (e.g., 'adam', 'sgd'), architecture-specific params (e.g., `dropout_conv`, `dense_units`).
-2.  **Training Session Configs (`configs/training_sessions/<name>.yaml`):**
-    - Define a complete training run.
-    - Structure:
-      - `session_name`: Unique identifier for the run.
-      - `model_architecture_name`: Key from `model_architectures.MODEL_REGISTRY`.
-      - `model_version_tag`: e.g., "1.0", "1.1-experimental".
-      - `hyperparameters_config_file`: Path to a hyperparams YAML (relative to `configs/`).
-      - `dataset_name`: e.g., "mnist".
-      - `data_preprocessing_options`: `normalize_to_0_1: true`.
-      - `data_augmentation_config`: `enabled: true`, `rotation_range: 10`, etc.
-      - `training_params`: `epochs: 20`, `validation_split: 0.1`.
-      - `callbacks`: `enable_model_checkpoint: true`, `enable_csv_logger: true`, `enable_tensorboard: false`.
-      - `notes`: Free text for describing the session.
-3.  Implement `src/utils/config_loader.py` to load and merge these YAMLs.
+1. **Hyperparameter Configs (`configs/hyperparams/<name>.yaml`):**
+   - Define sets of hyperparameters. Example: `hp_default.yaml`, `hp_robust_cnn_tuned.yaml`.
+   - Structure: `learning_rate`, `batch_size`, `optimizer_name` (e.g., 'adam', 'sgd'), architecture-specific params (e.g., `dropout_conv`, `dense_units`).
+2. **Training Session Configs (`configs/training_sessions/<name>.yaml`):**
+   - Define a complete training run.
+   - Structure:
+     - `session_name`: Unique identifier for the run.
+     - `model_architecture_name`: Key from `model_architectures.MODEL_REGISTRY`.
+     - `model_version_tag`: e.g., "1.0", "1.1-experimental".
+     - `hyperparameters_config_file`: Path to a hyperparams YAML (relative to `configs/`).
+     - `dataset_name`: e.g., "mnist".
+     - `data_preprocessing_options`: `normalize_to_0_1: true`.
+     - `data_augmentation_config`: `enabled: true`, `rotation_range: 10`, etc.
+     - `training_params`: `epochs: 20`, `validation_split: 0.1`.
+     - `callbacks`: `enable_model_checkpoint: true`, `enable_csv_logger: true`, `enable_tensorboard: false`.
+     - `notes`: Free text for describing the session.
+3. Implement `src/utils/config_loader.py` to load and merge these YAMLs.
 
 ### **4. Core Logic Implementation (`src/core/`)**
 
 (Same as previous plan: `data_processing.py`, `model_architectures.py`, `training_engine.py`, `evaluation_engine.py`, `prediction_engine.py`, `tfjs_converter_utils.py`. Emphasize robust image preprocessing in `data_processing.py` and model/log saving conventions in `training_engine.py`.)
 
-1.  **`data_processing.py`:**
-    - Function `load_mnist_data()`: Returns `(x_train, y_train), (x_test, y_test)`.
-    - Function `preprocess_training_data(images, labels, normalize=True)`: Normalizes, reshapes.
-    - Function `build_augmentation_pipeline(aug_config)`: Returns a Keras Sequential model of augmentation layers or an `ImageDataGenerator` setup.
-    - Function `preprocess_input_image_for_prediction(image_path, target_size=(28,28), invert_colors=False)`: Handles any input image size, resizes with padding, normalizes. Allow `invert_colors` as an option.
-2.  **`model_architectures.py`:**
-    - Implement `MODEL_REGISTRY`, `register_model` decorator, `get_model_architecture()`, `list_available_model_architectures()`.
-    - Define at least two model functions (e.g., `build_simple_cnn`, `build_robust_cnn`).
-3.  **`training_engine.py`:**
-    - `run_training_session(training_session_config_path)`:
-      - Load session config and associated hyperparams.
-      - Prepare data: `load_mnist_data`, `preprocess_training_data`.
-      - Setup augmentation if configured.
-      - Get model architecture using `model_architectures.get_model_architecture()`.
-      - Compile model using optimizer and learning rate from hyperparams.
-      - Setup callbacks (`ModelCheckpoint`, `CSVLogger`, custom for plotting/reporting).
-        - **Model Naming Convention for `ModelCheckpoint`:**
-          `{dataset_name}_{model_arch_name}_{model_version_tag}_{YYYYMMDD}_{HHMM}_acc{val_accuracy:.4f}`
-          (e.g., `mnist_CNN_Robust_v1_1.0_20250528_1030_acc0.9910`)
-          The output directory for this model will be this name under `models_trained/`.
-      - Run `model.fit()`.
-      - After fit, save training session config, hyperparams config used, and generate `model_card.md` inside the model's output directory.
-      - Generate and save accuracy/loss plots (as PNG) into the model's output directory.
-4.  **`evaluation_engine.py`:**
-    - `evaluate_model(model_path, x_test, y_test)`: Loads SavedModel, runs `model.evaluate()`, returns metrics.
-5.  **`prediction_engine.py`:**
-    - `load_trained_model(model_path)`: Loads SavedModel.
-    - `predict_digit(model, preprocessed_image_tensor)`: Returns predicted digit and confidence.
-6.  **`tfjs_converter_utils.py`:**
-    - `convert_saved_model_to_tfjs(saved_model_path, output_tfjs_path)`: Uses `tensorflowjs_converter` CLI via `subprocess`.
+1. **`data_processing.py`:**
+   - Function `load_mnist_data()`: Returns `(x_train, y_train), (x_test, y_test)`.
+   - Function `preprocess_training_data(images, labels, normalize=True)`: Normalizes, reshapes.
+   - Function `build_augmentation_pipeline(aug_config)`: Returns a Keras Sequential model of augmentation layers or an `ImageDataGenerator` setup.
+   - Function `preprocess_input_image_for_prediction(image_path, target_size=(28,28), invert_colors=False)`: Handles any input image size, resizes with padding, normalizes. Allow `invert_colors` as an option.
+2. **`model_architectures.py`:**
+   - Implement `MODEL_REGISTRY`, `register_model` decorator, `get_model_architecture()`, `list_available_model_architectures()`.
+   - Define at least two model functions (e.g., `build_simple_cnn`, `build_robust_cnn`).
+3. **`training_engine.py`:**
+   - `run_training_session(training_session_config_path)`:
+     - Load session config and associated hyperparams.
+     - Prepare data: `load_mnist_data`, `preprocess_training_data`.
+     - Setup augmentation if configured.
+     - Get model architecture using `model_architectures.get_model_architecture()`.
+     - Compile model using optimizer and learning rate from hyperparams.
+     - Setup callbacks (`ModelCheckpoint`, `CSVLogger`, custom for plotting/reporting).
+       - **Model Naming Convention for `ModelCheckpoint`:**
+         `{dataset_name}_{model_arch_name}_{model_version_tag}_{YYYYMMDD}_{HHMM}_acc{val_accuracy:.4f}`
+         (e.g., `mnist_CNN_Robust_v1_1.0_20250528_1030_acc0.9910`)
+         The output directory for this model will be this name under `models_trained/`.
+     - Run `model.fit()`.
+     - After fit, save training session config, hyperparams config used, and generate `model_card.md` inside the model's output directory.
+     - Generate and save accuracy/loss plots (as PNG) into the model's output directory.
+4. **`evaluation_engine.py`:**
+   - `evaluate_model(model_path, x_test, y_test)`: Loads SavedModel, runs `model.evaluate()`, returns metrics.
+5. **`prediction_engine.py`:**
+   - `load_trained_model(model_path)`: Loads SavedModel.
+   - `predict_digit(model, preprocessed_image_tensor)`: Returns predicted digit and confidence.
+6. **`tfjs_converter_utils.py`:**
+   - `convert_saved_model_to_tfjs(saved_model_path, output_tfjs_path)`: Uses `tensorflowjs_converter` CLI via `subprocess`.
 
 ### **5. CLI Interface Implementation (`src/cli/` & `src/main_cli.py`)**
 
 (Same as previous plan: modular Typer app with commands for training, model management, prediction, and TF.js conversion.)
 
-1.  **`main_cli.py`:** Setup main Typer app and add sub-apps.
-2.  **`train_cli.py`:**
-    - `train start --config <path_to_training_session_yaml>`: Calls `training_engine.run_training_session`.
-3.  **`model_cli.py`:**
-    - `model list-arch`: Calls `model_architectures.list_available_model_architectures`.
-    - `model list-trained [--sort-by <accuracy|date>]`: Scans `models_trained/`, parses names, displays info.
-    - `model info <trained_model_name_or_path>`: Displays `model_card.md` content, metrics from CSV, path to plots.
-    - `model evaluate <trained_model_path>`: Calls `evaluation_engine.evaluate_model`.
-4.  **`predict_cli.py`:**
-    - `predict image --model <trained_model_path>`: Prompts for image path, calls `data_processing.preprocess_input_image_for_prediction`, then `prediction_engine.predict_digit`.
-5.  **`convert_cli.py`:**
-    - `convert tfjs --model <trained_model_path> --output <output_dir_for_tfjs_model>`: Calls `tfjs_converter_utils.convert_saved_model_to_tfjs`.
-6.  **Utilities (`src/utils/`)**:
-    - `logging_setup.py`: Basic logging config.
-    - `file_ops.py`: Helpers for scanning directories, ensuring paths exist.
+1. **`main_cli.py`:** Setup main Typer app and add sub-apps.
+2. **`train_cli.py`:**
+   - `train start --config <path_to_training_session_yaml>`: Calls `training_engine.run_training_session`.
+3. **`model_cli.py`:**
+   - `model list-arch`: Calls `model_architectures.list_available_model_architectures`.
+   - `model list-trained [--sort-by <accuracy|date>]`: Scans `models_trained/`, parses names, displays info.
+   - `model info <trained_model_name_or_path>`: Displays `model_card.md` content, metrics from CSV, path to plots.
+   - `model evaluate <trained_model_path>`: Calls `evaluation_engine.evaluate_model`.
+4. **`predict_cli.py`:**
+   - `predict image --model <trained_model_path>`: Prompts for image path, calls `data_processing.preprocess_input_image_for_prediction`, then `prediction_engine.predict_digit`.
+5. **`convert_cli.py`:**
+   - `convert tfjs --model <trained_model_path> --output <output_dir_for_tfjs_model>`: Calls `tfjs_converter_utils.convert_saved_model_to_tfjs`.
+6. **Utilities (`src/utils/`)**:
+   - `logging_setup.py`: Basic logging config.
+   - `file_ops.py`: Helpers for scanning directories, ensuring paths exist.
 
 ### **6. Robust Reporting Feature (Integrated into `training_engine` and `model_cli`)**
 
 (Same as previous plan: generation of plots, CSV logs, config copies, and `model_card.md` within each `models_trained/<model_name>/` directory.)
 
-1.  **During Training (`training_engine.py`):**
+1. **During Training (`training_engine.py`):**
 
-    - Save copies of the exact `training_session.yaml` and `hyperparameters.yaml` used into the specific trained model's output directory (e.g., `models_trained/mnist_..._accX.XXXX/`).
-    - Ensure `CSVLogger` saves epoch-by-epoch `loss`, `accuracy`, `val_loss`, `val_accuracy`.
-    - Generate and save `accuracy_plot.png` and `loss_plot.png`.
-    - **`model_card.md` Generation:** After training, create a markdown file in the model's directory:
+   - Save copies of the exact `training_session.yaml` and `hyperparameters.yaml` used into the specific trained model's output directory (e.g., `models_trained/mnist_..._accX.XXXX/`).
+   - Ensure `CSVLogger` saves epoch-by-epoch `loss`, `accuracy`, `val_loss`, `val_accuracy`.
+   - Generate and save `accuracy_plot.png` and `loss_plot.png`.
+   - **`model_card.md` Generation:** After training, create a markdown file in the model's directory:
 
-      ```markdown
-      # Model Card: {{model_full_name}}
+     ```markdown
+     # Model Card: {{model_full_name}}
 
-      - **Architecture:** {{model_architecture_name}} (Version: {{model_version_tag}})
-      - **Trained At:** {{timestamp}}
-      - **Training Duration:** {{duration}}
-      - **Base Dataset:** {{dataset_name}}
-      - **Training Session Config:** `training_config_used.yaml`
-      - **Hyperparameters Config:** `hyperparams_config_used.yaml`
+     - **Architecture:** {{model_architecture_name}} (Version: {{model_version_tag}})
+     - **Trained At:** {{timestamp}}
+     - **Training Duration:** {{duration}}
+     - **Base Dataset:** {{dataset_name}}
+     - **Training Session Config:** `training_config_used.yaml`
+     - **Hyperparameters Config:** `hyperparams_config_used.yaml`
 
-      ## Final Metrics
+     ## Final Metrics
 
-      - **Training Loss:** {{final_train_loss}}
-      - **Training Accuracy:** {{final_train_accuracy}}
-      - **Validation Loss:** {{final_val_loss}}
-      - **Validation Accuracy:** {{final_val_accuracy}}
-      - (Test metrics if evaluation run)
+     - **Training Loss:** {{final_train_loss}}
+     - **Training Accuracy:** {{final_train_accuracy}}
+     - **Validation Loss:** {{final_val_loss}}
+     - **Validation Accuracy:** {{final_val_accuracy}}
+     - (Test metrics if evaluation run)
 
-      ## Training History
+     ## Training History
 
-      - [Training Log CSV](./training_log.csv)
-      - Accuracy Plot: ![Accuracy](./accuracy_plot.png)
-      - Loss Plot: ![Loss](./loss_plot.png)
+     - [Training Log CSV](./training_log.csv)
+     - Accuracy Plot: ![Accuracy](./accuracy_plot.png)
+     - Loss Plot: ![Loss](./loss_plot.png)
 
-      ## Notes
+     ## Notes
 
-      {{notes_from_training_session_config}}
-      ```
+     {{notes_from_training_session_config}}
+     ```
 
-2.  **CLI Display (`model_cli.py model info ...`):**
-    - Read and pretty-print the `model_card.md`.
-    - Optionally, re-plot graphs if needed or just point to the saved PNGs.
+2. **CLI Display (`model_cli.py model info ...`):**
+
+   - Read and pretty-print the `model_card.md`.
+   - Optionally, re-plot graphs if needed or just point to the saved PNGs.
 
 ### **7. Makefile Enhancement (Optional but Recommended for Automation)**
 
@@ -316,7 +317,6 @@ train_default:
 - Plan to use `pytest`.
 - Write unit tests for functions in `src/core/` (especially data processing, config loading).
 - Write integration tests for CLI commands using `typer.testing.CliRunner`. Place these in the `tests/` directory.
-
 - Plan for unit tests (`pytest`) for core functions in `data_processing.py`, `model_architectures.py`.
 - Plan for integration tests for CLI commands (e.g., using `typer.testing.CliRunner`).
 
@@ -536,47 +536,48 @@ This project uses YAML files for managing configurations, promoting reproducibil
 
 The core models used in this project are Convolutional Neural Networks (CNNs), which are particularly well-suited for image recognition tasks.
 
-1.  **Input:** The MNIST dataset consists of 28x28 pixel grayscale images of handwritten digits (0-9). Before being fed to the network, these images are preprocessed:
+1. **Input:** The MNIST dataset consists of 28x28 pixel grayscale images of handwritten digits (0-9). Before being fed to the network, these images are preprocessed:
 
-    - **Normalization:** Pixel values (typically 0-255) are scaled to a smaller range (e.g., 0-1). This helps with training stability and convergence.
-    - **Reshaping:** Images are reshaped to include a channel dimension (e.g., `(28, 28, 1)` for grayscale).
-    - For custom input images during prediction, the tool provides robust preprocessing to convert images of any size to this required format, including grayscale conversion, aspect-ratio preserving resize with padding, and normalization.
+   - **Normalization:** Pixel values (typically 0-255) are scaled to a smaller range (e.g., 0-1). This helps with training stability and convergence.
+   - **Reshaping:** Images are reshaped to include a channel dimension (e.g., `(28, 28, 1)` for grayscale).
+   - For custom input images during prediction, the tool provides robust preprocessing to convert images of any size to this required format, including grayscale conversion, aspect-ratio preserving resize with padding, and normalization.
 
-2.  **Convolutional Layers (`Conv2D`):**
+2. **Convolutional Layers (`Conv2D`):**
 
-    - These layers apply a set of learnable filters (kernels) to the input image. Each filter detects specific features like edges, corners, or textures.
-    - The output is a set of "feature maps" highlighting these detected features.
+   - These layers apply a set of learnable filters (kernels) to the input image. Each filter detects specific features like edges, corners, or textures.
+   - The output is a set of "feature maps" highlighting these detected features.
 
-3.  **Activation Functions (e.g., `ReLU` - Rectified Linear Unit):**
+3. **Activation Functions (e.g., `ReLU` - Rectified Linear Unit):**
 
-    - Applied after convolutional layers to introduce non-linearity, allowing the network to learn more complex patterns. ReLU sets all negative values to zero.
+   - Applied after convolutional layers to introduce non-linearity, allowing the network to learn more complex patterns. ReLU sets all negative values to zero.
 
-4.  **Batch Normalization (`BatchNormalization`):**
+4. **Batch Normalization (`BatchNormalization`):**
 
-    - Normalizes the output of the previous layer during training. This helps stabilize learning, accelerates training, and can act as a regularizer.
+   - Normalizes the output of the previous layer during training. This helps stabilize learning, accelerates training, and can act as a regularizer.
 
-5.  **Pooling Layers (`MaxPooling2D`):**
+5. **Pooling Layers (`MaxPooling2D`):**
 
-    - Reduce the spatial dimensions (width and height) of the feature maps, making the network more robust to variations in feature positions and reducing computational load. Max pooling takes the maximum value from a small window of the feature map.
+   - Reduce the spatial dimensions (width and height) of the feature maps, making the network more robust to variations in feature positions and reducing computational load. Max pooling takes the maximum value from a small window of the feature map.
 
-6.  **Dropout Layers (`Dropout`):**
+6. **Dropout Layers (`Dropout`):**
 
-    - A regularization technique to prevent overfitting. During training, it randomly sets a fraction of input units to 0 at each update, forcing the network to learn more robust features.
+   - A regularization technique to prevent overfitting. During training, it randomly sets a fraction of input units to 0 at each update, forcing the network to learn more robust features.
 
-7.  **Flatten Layer (`Flatten`):**
+7. **Flatten Layer (`Flatten`):**
 
-    - Converts the 2D feature maps from the convolutional/pooling blocks into a 1D vector, preparing it for the fully connected layers.
+   - Converts the 2D feature maps from the convolutional/pooling blocks into a 1D vector, preparing it for the fully connected layers.
 
-8.  **Dense Layers (Fully Connected Layers):**
+8. **Dense Layers (Fully Connected Layers):**
 
-    - Standard neural network layers where each neuron is connected to all neurons in the previous layer. These layers learn higher-level combinations of features.
-    - The final dense layer has a number of neurons equal to the number of classes (10 for MNIST) and uses a `softmax` activation function.
+   - Standard neural network layers where each neuron is connected to all neurons in the previous layer. These layers learn higher-level combinations of features.
+   - The final dense layer has a number of neurons equal to the number of classes (10 for MNIST) and uses a `softmax` activation function.
 
-9.  **Softmax Activation (Output Layer):**
+9. **Softmax Activation (Output Layer):**
 
-    - Converts the raw output scores (logits) from the final dense layer into a probability distribution over the classes. Each output neuron will have a value between 0 and 1, and all values will sum to 1, representing the model's confidence for each digit.
+   - Converts the raw output scores (logits) from the final dense layer into a probability distribution over the classes. Each output neuron will have a value between 0 and 1, and all values will sum to 1, representing the model's confidence for each digit.
 
 10. **Training (Optimization):**
+
     - The model learns by comparing its predictions to the true labels using a **loss function** (e.g., `sparse_categorical_crossentropy` for integer labels).
     - An **optimizer** (e.g., `Adam`, `SGD`) adjusts the model's weights (filters in Conv2D, weights in Dense layers) to minimize this loss function through a process called backpropagation.
 
@@ -584,42 +585,48 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
 
 (Same as the previous README plan, ensure paths reflect the CCDS-based structure if needed, e.g., `make install_dev` might be a new first step from the Makefile.)
 
-1.  **Clone the Repository (if applicable) or Setup Project:**
-    ```bash
-    # Assuming you have the project files in python_mnist_ml/
-    cd python_mnist_ml
-    ```
-2.  **Setup Environment & Install Dependencies:**
-    ```bash
-    python -m venv venv
-    source venv/bin/activate  # Or venv\Scripts\activate on Windows
-    pip install -r requirements.txt
-    ```
-3.  **Train a Model with a Default Configuration:**
+1. **Clone the Repository (if applicable) or Setup Project:**
 
-    - First, ensure a default training session config exists, e.g., `configs/training_sessions/ts_default_run.yaml`.
-    - This default config should point to a default hyperparameter config, e.g., `configs/hyperparams/hp_default.yaml`.
+   ```bash
+   # Assuming you have the project files in python_mnist_ml/
+   cd python_mnist_ml
+   ```
 
-    ```bash
-    python src/main_cli.py train start --config configs/training_sessions/ts_default_run.yaml
-    ```
+2. **Setup Environment & Install Dependencies:**
 
-    - Note the full name of the trained model directory that gets created under `models_trained/`. It will look something like `mnist_CNN_Simple_v1_1.0_YYYYMMDD_HHMM_acc0.XXXX`.
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Or venv\Scripts\activate on Windows
+   pip install -r requirements.txt
+   ```
 
-4.  **List Trained Models:**
+3. **Train a Model with a Default Configuration:**
 
-    ```bash
-    python src/main_cli.py model list-trained
-    ```
+   - First, ensure a default training session config exists, e.g., `configs/training_sessions/ts_default_run.yaml`.
+   - This default config should point to a default hyperparameter config, e.g., `configs/hyperparams/hp_default.yaml`.
 
-5.  **Predict a Digit from an Image:**
-    - You'll need a sample digit image. You can create one or find one online. Save it to `data/02_custom_input_images/my_digit.png`.
-    - Replace `<YOUR_TRAINED_MODEL_NAME>` with the directory name from step 3 or `model list-trained`.
-    ```bash
-    python src/main_cli.py predict image --model models_trained/<YOUR_TRAINED_MODEL_NAME>
-    # The CLI will then prompt you for the image path:
-    # Enter the path to your image file: data/02_custom_input_images/my_digit.png
-    ```
+   ```bash
+   python src/main_cli.py train start --config configs/training_sessions/ts_default_run.yaml
+   ```
+
+   - Note the full name of the trained model directory that gets created under `models_trained/`. It will look something like `mnist_CNN_Simple_v1_1.0_YYYYMMDD_HHMM_acc0.XXXX`.
+
+4. **List Trained Models:**
+
+   ```bash
+   python src/main_cli.py model list-trained
+   ```
+
+5. **Predict a Digit from an Image:**
+
+   - You'll need a sample digit image. You can create one or find one online. Save it to `data/02_custom_input_images/my_digit.png`.
+   - Replace `<YOUR_TRAINED_MODEL_NAME>` with the directory name from step 3 or `model list-trained`.
+
+   ```bash
+   python src/main_cli.py predict image --model models_trained/<YOUR_TRAINED_MODEL_NAME>
+   # The CLI will then prompt you for the image path:
+   # Enter the path to your image file: data/02_custom_input_images/my_digit.png
+   ```
 
 ### **9. How-To Guides**
 
@@ -629,18 +636,18 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
 
 - **How to Define a New Model Architecture:**
 
-  1.  Open `src/core/model_architectures.py`.
-  2.  Define a new Python function that returns a `tf.keras.Model` (e.g., `build_my_custom_cnn(...)`).
-  3.  Decorate it with `@register_model("MyCustomCNN_v1")`.
-  4.  You can now reference `"MyCustomCNN_v1"` in your training session YAML files.
+  1. Open `src/core/model_architectures.py`.
+  2. Define a new Python function that returns a `tf.keras.Model` (e.g., `build_my_custom_cnn(...)`).
+  3. Decorate it with `@register_model("MyCustomCNN_v1")`.
+  4. You can now reference `"MyCustomCNN_v1"` in your training session YAML files.
 
 - **How to Create New Hyperparameter & Training Session Configs:**
 
-  1.  Navigate to `configs/hyperparams/` or `configs/training_sessions/`.
-  2.  Copy an existing `.yaml` file (e.g., `cp hp_default.yaml hp_experimental.yaml`).
-  3.  Edit the new YAML file with your desired parameters.
-  4.  Reference the new hyperparameter file in your new training session config if needed.
-  5.  Use the new training session config with `python src/main_cli.py train start --config ...`.
+  1. Navigate to `configs/hyperparams/` or `configs/training_sessions/`.
+  2. Copy an existing `.yaml` file (e.g., `cp hp_default.yaml hp_experimental.yaml`).
+  3. Edit the new YAML file with your desired parameters.
+  4. Reference the new hyperparameter file in your new training session config if needed.
+  5. Use the new training session config with `python src/main_cli.py train start --config ...`.
 
 - **How to View Information about a Trained Model:**
 
@@ -663,6 +670,7 @@ The core models used in this project are Convolutional Neural Networks (CNNs), w
   ```
 
 - **How to Interpret Training Logs and Plots:**
+
   - The `training_log.csv` file in each model's directory contains epoch-by-epoch metrics: `epoch`, `accuracy`, `loss`, `val_accuracy`, `val_loss`.
   - `accuracy_plot.png`: Shows training and validation accuracy. Ideally, both should increase and converge. A large gap might indicate overfitting.
   - `loss_plot.png`: Shows training and validation loss. Ideally, both should decrease and converge. Increasing validation loss while training loss decreases is a strong sign of overfitting.
